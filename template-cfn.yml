@@ -19,7 +19,7 @@ Resources:
     Type: AWS::EC2::Instance
     Properties:
       ImageId: ami-06e46074ae430fba6
-      KeyName: my_key
+      KeyName: BerraComputer
       InstanceType: t2.micro
       SecurityGroupIds:
         - !Ref WebServerSG
@@ -33,7 +33,7 @@ Resources:
           yum update -y
           yum install httpd -y
 
-          FOLDER="https://raw.githubusercontent.com/Elyes-Ferjani/KittensCarouselProject/main/static-web"
+          FOLDER="https://raw.githubusercontent.com/omer2021/Kitty/main/static-web"
 
           cd /var/www/html
 
