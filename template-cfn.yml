@@ -1,0 +1,53 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: |
+  Cloudformation Template for Kittens Carousel Project that creates an EC2 instance of type t2.micro and a Security Group...
+Resources:
+  WebServerSG:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow traffic through port 80 and 22
+      SecurityGroupIngress:
+        - CidrIp: "0.0.0.0/0"
+          FromPort: 80
+          ToPort: 80
+          IpProtocol: tcp
+        - CidrIp: "0.0.0.0/0"
+          FromPort: 22
+          ToPort: 22
+          IpProtocol: tcp
+  WebServer:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: ami-06e46074ae430fba6
+      KeyName: my_key
+      InstanceType: t2.micro
+      SecurityGroupIds:
+        - !Ref WebServerSG
+      Tags:
+        - Key: Name
+          Value: !Sub WebServer of stack ${AWS::StackName}
+      UserData: 
+        Fn::Base64: |
+          #!/bin/bash
+
+          yum update -y
+          yum install httpd -y
+
+          FOLDER="https://raw.githubusercontent.com/Elyes-Ferjani/KittensCarouselProject/main/static-web"
+
+          cd /var/www/html
+
+          wget $FOLDER/index.html
+          wget $FOLDER/cat0.jpg
+          wget $FOLDER/cat1.jpg
+          wget $FOLDER/cat2.jpg
+          wget $FOLDER/cat3.png
+
+          systemctl enable httpd
+          systemctl start httpd
+Outputs:
+  WebServerPublicDNS:
+    Description: Public DNS Name of Kittens Web Server
+    Value: !Sub 
+      - http://${PublicDNS}
+      - PublicDNS: !GetAtt WebServer.PublicDnsName
